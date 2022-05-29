@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<incomplete>
+    
+    <wavname id="65">SWAV_BGM_FF6_32a_000</wavname>  <!--Overture (a) - Opera-->
+    <wavname id="66">SWAV_BGM_FF6_32b{0}_000</wavname>  <!--Overture (b) - Opera-->
+    <wavname id="67">SWAV_BGM_FF6_32c_000</wavname>  <!--Overture (c) - Opera-->
+    <wavname id="39">SWAV_BGM_FF6_33{0}_000</wavname>  <!--Aria di Mezzo Carattere - Opera-->
+    <wavname id="38">SWAV_BGM_FF6_34a_000</wavname>  <!--Wedding Waltz - Duel (a) - Opera-->
+    <wavname id="68">SWAV_BGM_FF6_34b_000</wavname>  <!--Wedding Waltz - Duel (b) - Opera-->
+    <wavname id="69">SWAV_BGM_FF6_34c{0}_000</wavname>  <!--Wedding Waltz - Duel (c) - Opera-->
+    <wavname id="70">SWAV_BGM_FF6_34d_000</wavname>  <!--Wedding Waltz - Duel (d) - Opera-->
+    <wavname id="34">SWAV_BGM_FF6_35_000</wavname>  <!--Grand Finale - Opera-->
+    
+    <wavname id="1">SWAV_BGM_FF6_59d_000</wavname>  <!--Dancing Mad Movement 4 intro-->
+    <wavname id="1">SWAV_BGM_FF6_59e_000</wavname>  <!--Dancing Mad Movement 4-->
+    
+    <wavname id="1">SWAV_BGM_FF6_60_000</wavname>  <!--Balance is Restored (full)-->
+    <wavname id="1">SWAV_BGM_FF6_60a_000</wavname>  <!--Balance is Restored (a)-->
+    <wavname id="1">SWAV_BGM_FF6_60a1_000</wavname>  <!--Balance is Restored (a1)-->
+    <wavname id="1">SWAV_BGM_FF6_60a2_000</wavname>  <!--Balance is Restored (a2)-->
+    <wavname id="1">SWAV_BGM_FF6_60b_000</wavname>  <!--Balance is Restored (b)-->
+    
+</incomplete>
