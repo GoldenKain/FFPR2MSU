@@ -1,4 +1,5 @@
 using System.Xml.Linq;
+using System.Reflection;
 
 namespace FF6PR2MSU;
 
@@ -9,9 +10,24 @@ public static class Conversion
 
     public static void InitializeDictionary(string languageCode)
     {
-        XDocument doc = XDocument.Load("wav2msu.xml");
-        IEnumerable<XElement> rootNodes = doc.Root.DescendantNodes().OfType<XElement>();
-        wav2msuDictionary = rootNodes.ToDictionary(v => string.Format(v.Value, languageCode), v => v.Attribute("id").Value);
+        try
+        {
+            Stream xmlStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("FF6PR2MSU.wav2msu.xml");
+
+            if (xmlStream == null)
+            {
+                throw new Exception();
+            }
+
+            XDocument doc = XDocument.Load(xmlStream);
+            IEnumerable<XElement> rootNodes = doc.Root.DescendantNodes().OfType<XElement>();
+            wav2msuDictionary = rootNodes.ToDictionary(v => string.Format(v.Value, languageCode), v => v.Attribute("id").Value);
+        }
+        catch
+        {
+            Console.WriteLine("Error occured when reading the XML file.");
+            Environment.Exit(0);
+        }
     }
 
     public static string GetName(string wavFileName)
