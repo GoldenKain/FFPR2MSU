@@ -1,5 +1,5 @@
-# FF6PR2MSU (Final Fantasy 6 Pixel Remaster to MSU-1)
-FF6PR2MSU is a tool for Linux and Windows to take the .wav audio files from FF6PR and make them work with [Dizzy611](https://github.com/Dizzy611)'s [DancingMadFF6](https://github.com/Dizzy611/DancingMadFF6) MSU-1 hack.
+# FF6PR2MSU (Final Fantasy IV Pixel Remaster to MSU-1)
+FF6PR2MSU is a tool for Linux and Windows to take the ripped .wav audio files from Final Fantasy IV Pixel Remaster (which will be referred to as FF6PR from now on) and make them work with [Dizzy611](https://github.com/Dizzy611)'s [DancingMadFF6](https://github.com/Dizzy611/DancingMadFF6) Final Fantasy III (SNES) MSU-1 hack.
 
 ## STILL A WORK IN PRORESS!
 The application is incomplete, unoptimized, is untested on Windows, still requires a script to batch the operations and was put together in a day... As such, it might still be buggy and the code is in dire need of organizing and cleaning up.
@@ -9,11 +9,11 @@ Right now, users will need to find a wav2msu executable or simply compile [jbait
 ### TO-DO
 1. Streamline how to load all necessary files. Maybe I should just ask a path to a folder instead of recquiring all files as arguments?
 2. Either use wav2msu.c as a native C library or re-write it in C# in the app so it doesn't require an external executable to convert the .wav to .pcm files.
-3. See if it's possible to only require the single FFPR audio resource file instead of the ripped ones... It would certainly make this whole process way more simple and user-friendly.
+3. See if it's possible to only require the single FF6PR resource file instead of the ripped audio files... It would certainly make this whole process way more simple and user-friendly.
 4. (TBD) Repurpose and open up the app to allow converting FF4 and FF5PR audio files for FF4/5 MSU-1 hacks (if those even exist).
 
 ## DISCLAIMER
-I will <b><i>NOT</i></b> share the Pixel Remaster audio files themselves. The files are under copyright, thus sharing them around would be illegal. You will need to supply your own. To do so, I recommend you look around how to rip the audio resource files from the Steam release of the game.
+I will <b><i>NOT</i></b> share the Pixel Remaster audio files themselves. The files are under copyright, thus sharing them around would be illegal. You will need to supply your own. To do so, I recommend you look around how to rip the audio from resource files of the Steam release of the game.
 <br /><br />
 FF6PR2MSU was made under the LGPL license, as such, you may use it and redistribute it. However, any modification to the program has to be made available under the same license.
 
@@ -27,7 +27,7 @@ This process is bound to change and as such has been written pretty quickly... I
 4. Assuming you managed to follow my poorly written steps... you should now have a bunch (around 75) .pcm files. Now, you need to patch your rom file and place all the files in the right location for your use (either an FX Pak Pro or an emulator). For that, head over to the [DancingMadFF6](https://github.com/Dizzy611/DancingMadFF6)'s repository page, and patch your FF3 rom with the .ips file.
 
 ## CREDITS
-This was made possible by the incredible work of user [Dizzy611](https://github.com/Dizzy611) on his tool [DancingMadFF6](https://github.com/Dizzy611/DancingMadFF6) which allows for MSU-1 streamed audio in FFIII and the [VGAudio](https://github.com/Thealexbarney/VGAudio) library by user [Thealexbarney](https://github.com/Thealexbarney).
+This was made possible by the incredible work of user [Dizzy611](https://github.com/Dizzy611) on his tool [DancingMadFF6](https://github.com/Dizzy611/DancingMadFF6) which allows for MSU-1 streamed audio in Final Fantasy III and the [VGAudio](https://github.com/Thealexbarney/VGAudio) library by user [Thealexbarney](https://github.com/Thealexbarney).
 <br /><br />
 FF6PR2MSU also requires the use of wav2msu, a tool to convert wave audio files to the PCM format used by the MSU-1. The original version of this tool was made by a user named Kawa whose page or original C# source code I could not find online... As such, I'll link you to [jbaiter](https://github.com/jbaiter)'s [reimplementation in C](https://github.com/jbaiter/wav2msu).
 
