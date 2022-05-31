@@ -1,5 +1,5 @@
-# FF6PR2MSU (Final Fantasy IV Pixel Remaster to MSU-1)
-FF6PR2MSU is a tool for Linux and Windows to take the ripped .wav audio files from Final Fantasy IV Pixel Remaster (which will be referred to as FF6PR from now on) and make them work with [Dizzy611](https://github.com/Dizzy611)'s [DancingMadFF6](https://github.com/Dizzy611/DancingMadFF6) Final Fantasy III (SNES) MSU-1 hack.
+# FF6PR2MSU (Final Fantasy VI Pixel Remaster to MSU-1)
+FF6PR2MSU is a tool for Linux and Windows to take the ripped .wav audio files from Final Fantasy VI Pixel Remaster (which will be referred to as FF6PR from now on) and make them work with [Dizzy611](https://github.com/Dizzy611)'s [DancingMadFF6](https://github.com/Dizzy611/DancingMadFF6) Final Fantasy III (SNES) MSU-1 hack.
 
 ## STILL A WORK IN PRORESS!
 The application is incomplete, unoptimized, is untested on Windows, still requires a script to batch the operations and was put together in a day... As such, it might still be buggy and the code is in dire need of organizing and cleaning up.
