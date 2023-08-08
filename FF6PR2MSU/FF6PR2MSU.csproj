@@ -11,6 +11,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="AssetsToοls" Version="1.0.1" />
       <PackageReference Include="VGAudio" Version="2.2.1" />
     </ItemGroup>
 

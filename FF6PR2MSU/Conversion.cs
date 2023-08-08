@@ -30,7 +30,7 @@ public static class Conversion
         }
     }
 
-    public static string GetName(string wavFileName)
+    public static string LookupName(string wavFileName)
     {
         if (!wav2msuDictionary.TryGetValue(wavFileName, out string pcmNumber))
         {
