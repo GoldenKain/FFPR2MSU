@@ -115,7 +115,7 @@ class Program
                     continue;
                 }
 
-                if (Path.GetInvalidFileNameChars().Length > 0)
+                if (Path.GetInvalidFileNameChars().Any(c => name.Contains(c)))
                 {
                     Console.WriteLine("This file name contains invalid characters. Try again.");
                     continue;
@@ -173,11 +173,16 @@ class Program
 
             var processStartInfo = new ProcessStartInfo("wav2msu.exe", param)
             {
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
+                RedirectStandardOutput = true
             };
 
-            Process process = Process.Start(processStartInfo);
+            Process? process = Process.Start(processStartInfo);
+
+            // To prevent deadlock error when the StandardOutput buffer is at capacity.
+            // https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardoutput?view=net-7.0
+            process?.StandardOutput.ReadToEnd();
+            process?.StandardOutput.Close();
+
             process?.WaitForExit();
 
             switch (process?.ExitCode)
@@ -191,6 +196,8 @@ class Program
                     Console.WriteLine($@"""{file}"" could not be converted.");
                     break;
             }
+
+            process?.Dispose();
         }
 
         CleanUp();
@@ -275,13 +282,20 @@ class Program
 
             var processStartInfo = new ProcessStartInfo("AudioMog.exe", audioMogArgs)
             {
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
+                RedirectStandardOutput = true
             };
 
             Console.WriteLine("Converting the game's audio assets to .wav (this can take a few minutes)...");
 
-            Process.Start(processStartInfo)?.WaitForExit();
+            Process? p = Process.Start(processStartInfo);
+
+            // To prevent deadlock error when the StandardOutput buffer is at capacity.
+            // https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardoutput?view=net-7.0
+            p?.StandardOutput.ReadToEnd();
+            p?.StandardOutput.Close();
+
+            p?.WaitForExit();
+            p?.Dispose();
 
             return true;
         }
