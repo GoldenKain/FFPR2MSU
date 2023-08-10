@@ -16,12 +16,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="mav2msu_incomplete.xml" />
       <EmbeddedResource Include="wav2msu.xml">
         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       </EmbeddedResource>
-      <None Remove="mav2msu_incomplete.xml" />
-      <None Remove="wav2msu.xml" />
     </ItemGroup>
 
 </Project>

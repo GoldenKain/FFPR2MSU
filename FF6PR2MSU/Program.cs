@@ -1,4 +1,4 @@
-﻿using AssetsTools;
+using AssetsTools;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using VGAudio.Containers.Wave;
@@ -8,6 +8,9 @@ namespace FF6PR2MSU;
 
 class Program
 {
+    private const string TEMP_DIRECTORY_PATH = "tmp"; // relative
+    private const string OUTPUT_DIRECTORY_PATH = "output"; // relative
+
     public static void Main(string[] args)
     {
         if (args.Length == 0)
@@ -22,15 +25,14 @@ class Program
             return;
         }
 
-        CleanUp(true);
-
-        if (!File.Exists("wav2msu.exe"))
+        if (!Directory.Exists(OUTPUT_DIRECTORY_PATH))
         {
-            Console.WriteLine("wav2msu.exe not found. Exiting program.");
-            return;
+            Directory.CreateDirectory(OUTPUT_DIRECTORY_PATH);
         }
 
-        if (!ParseBundleFile(args[0]) || Directory.GetFiles("tmp").Length < 1)
+        CleanUp(true);
+
+        if (!ParseBundleFile(args[0]) || Directory.GetFiles(TEMP_DIRECTORY_PATH).Length < 1)
         {
             Console.WriteLine("Bundle file not valid. Exiting program.");
             CleanUp();
@@ -44,7 +46,7 @@ class Program
             return;
         }
 
-        var files = Directory.GetFiles("tmp\\", "*.wav", SearchOption.AllDirectories);
+        var files = Directory.GetFiles(TEMP_DIRECTORY_PATH, "*.wav", SearchOption.AllDirectories);
 
         if (files == null || files.Length < 1)
         {
@@ -53,7 +55,7 @@ class Program
             return;
         }
 
-        string languageCharacterCode = null;
+        string? languageCharacterCode = null;
 
         do
         {
@@ -132,72 +134,39 @@ class Program
 
         foreach (string file in files)
         {
+            string filename = Path.GetFileName(file);
+
             if (!File.Exists(file))
             {
-                Console.WriteLine($"{file} This file doesn't exist. Skipping.");
+                Console.WriteLine($"{filename} This file doesn't exist or doesn't have proper access. Skipping.");
                 continue;
             }
             
-            if (!file.EndsWith(".wav"))
+            if (!file.EndsWith(".wav", StringComparison.CurrentCultureIgnoreCase))
             {
                 continue;
             }
 
-            string path = Path.GetFullPath(file);
-            string filename = Path.GetFileNameWithoutExtension(path);
-
             var match = Regex.Match(filename, "FF6_[0-9]+[abcde12]*(_[A-Z]{3})*");
-            string msuName = null;
+            string? msuName = null;
             
             if (!match.Success || (msuName = Conversion.LookupName(match.Value)) == null)
             {
-                Console.WriteLine($@"""{file}"" is not part of the msu patch or is named wrong. Skipping.");
+                Console.WriteLine($@"""{filename}"" is not part of the msu patch. Skipping.");
                 continue;
             }
             
-            using FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read);
-            WaveReader reader = new WaveReader();
-            IAudioFormat format = reader.ReadFormat(stream);
+            using FileStream stream = new FileStream(file, FileMode.Open, FileAccess.Read);
+            IAudioFormat format = new WaveReader().ReadFormat(stream);
 
-            bool looping = format.Looping;
-            int loopStart = format.LoopStart;
-
-            string param = @$"-o ""{$"{Environment.CurrentDirectory}/{romFileName}-{msuName}.pcm"}"" ";
-
-            if (looping)
+            if (Wav2Msu.Convert(file, Path.Join(OUTPUT_DIRECTORY_PATH, $"{romFileName}-{msuName}.pcm"), format.Looping ? format.LoopStart : 0L))
             {
-                param += $"-l {loopStart} ";
+                Console.WriteLine($@"""{filename}"" has been converted successfully.");
             }
-
-            param += @$"""{path}"" ";
-
-            var processStartInfo = new ProcessStartInfo("wav2msu.exe", param)
+            else
             {
-                RedirectStandardOutput = true
-            };
-
-            Process? process = Process.Start(processStartInfo);
-
-            // To prevent deadlock error when the StandardOutput buffer is at capacity.
-            // https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo.redirectstandardoutput?view=net-7.0
-            process?.StandardOutput.ReadToEnd();
-            process?.StandardOutput.Close();
-
-            process?.WaitForExit();
-
-            switch (process?.ExitCode)
-            {
-                case 0:
-                    Console.WriteLine($@"""{file}"" has been converted successfully.");
-                    break;
-
-                case -1:
-                default:
-                    Console.WriteLine($@"""{file}"" could not be converted.");
-                    break;
+                Console.WriteLine($@"""{filename}"" could not be converted.");
             }
-
-            process?.Dispose();
         }
 
         CleanUp();
@@ -209,7 +178,7 @@ class Program
             "=========+ Final Fantasy VI Pixel Remaster to MSU-1 conversion tool +========= \n" +
             "https://github.com/GoldenKain/FF6PR2MSU\n" + 
             "How to use? Simply drag and drop the appropriate music .bundle file (file containing Unity assets) from the directory of the PC version of Final Fantasy VI Pixel Remaster and you should be good to go! Well... Almost...\n\n" +
-            "To work, this program also needs (for now at least...) the executable for AudioMog, a program that converts assets of Square Enix games to the desired files (in this case, wave audio files). Here's a link to their github page. You simply need to download the latest version of the program and extract the contents of the zip file in the same directory as FF6PR2MSU. \n" +
+            "To work, this program also needs (for now at least...) the executable for AudioMog, a program that converts assets of Square Enix games to the desired files (in this case, wave audio files). Here's a link to their github page <https://github.com/Yoraiz0r/AudioMog>. You simply need to download the latest version of the program and extract the contents of the zip file in the same directory as FF6PR2MSU. \n" +
             "Something else you might want to know, the name of the Unity bundle file for Final Fantasy VI Pixel Remaster is named \"ff6_bgm_assets_all_181eb630118efa8542dab51f7e8d2795.bundle\" or something to that effect. I imagine it's possible that the name of the file might change a little after some updates, but that part should stay the same: \"ff6_bgm_assets\". \n\n" +
             "For more information and full credits, please consult the project's Github page.");
     }
@@ -221,19 +190,19 @@ class Program
             Console.WriteLine("Cleaning work directory...");
         }
 
-        if (!Directory.Exists("tmp"))
+        if (!Directory.Exists(TEMP_DIRECTORY_PATH))
         {
             return;
         }
 
         try 
         {
-            foreach (string filePath in Directory.EnumerateFiles("tmp"))
+            foreach (string filePath in Directory.EnumerateFiles(TEMP_DIRECTORY_PATH))
             {
                 File.Delete(filePath);
             }
 
-            Directory.Delete("tmp", true);
+            Directory.Delete(TEMP_DIRECTORY_PATH, true);
         }
         catch
         {
@@ -250,9 +219,9 @@ class Program
     {
         // TODO find out how to do it by myself without having to resort to calling MogAudio executable...
 
-        if (!Directory.Exists("tmp"))
+        if (!Directory.Exists(TEMP_DIRECTORY_PATH))
         {
-            Directory.CreateDirectory("tmp");
+            Directory.CreateDirectory(TEMP_DIRECTORY_PATH);
         }
 
         if (!File.Exists("AudioMog.exe") || !File.Exists("TerminalSettings.json"))
@@ -275,7 +244,7 @@ class Program
             File.WriteAllText("TerminalSettings.json", settingsFile);
 
             string audioMogArgs = string.Empty;
-            foreach (var file in Directory.GetFiles("tmp\\", "*.bytes", SearchOption.TopDirectoryOnly))
+            foreach (var file in Directory.GetFiles(TEMP_DIRECTORY_PATH, "*.bytes", SearchOption.TopDirectoryOnly))
             {
                 audioMogArgs += $"\"{file}\" ";
             }
@@ -307,9 +276,9 @@ class Program
 
     private static bool ParseBundleFile(string bundleFilePath)
     {
-        if (!Directory.Exists("tmp"))
+        if (!Directory.Exists(TEMP_DIRECTORY_PATH))
         {
-            Directory.CreateDirectory("tmp");
+            Directory.CreateDirectory(TEMP_DIRECTORY_PATH);
         }
 
         try
@@ -328,7 +297,7 @@ class Program
                 var name = baseField.Get(0).Value.AsString();
                 var data = baseField.Get(1).Value.AsStringBytes();
 
-                File.WriteAllBytes($"tmp\\{name + ".bytes"}", data);
+                File.WriteAllBytes(Path.Join(TEMP_DIRECTORY_PATH, $"{name}.bytes"), data);
             }
         }
         catch
