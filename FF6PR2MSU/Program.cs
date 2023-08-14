@@ -1,5 +1,6 @@
 using AssetsTools;
 using System.Diagnostics;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using VGAudio.Containers.Wave;
 using VGAudio.Formats;
@@ -8,20 +9,52 @@ namespace FF6PR2MSU;
 
 class Program
 {
+    public const string GAME_CODE_FF4 = "FF4";
+    public const string GAME_CODE_FF5 = "FF5";
+    public const string GAME_CODE_FF6 = "FF6";
+
     private const string TEMP_DIRECTORY_PATH = "tmp"; // relative
     private const string OUTPUT_DIRECTORY_PATH = "output"; // relative
 
     public static void Main(string[] args)
     {
-        if (args.Length == 0)
+        if (args.Length == 0 || args.Any(a => a.Contains("-h") || a.Contains("--help") || a.Contains("/?") || a.Contains("help")))
         {
-            Console.WriteLine("Invalid command");
+            PrintMan();
             return;
         }
 
-        if (args.Any(a => a.Contains("-h") || a.Contains("--help") || a.Contains("/?")))
+        var bundleFilePath = args[0];
+
+        if (!File.Exists(bundleFilePath))
         {
-            PrintMan();
+            Console.WriteLine($"Could not find the file \"{bundleFilePath}\". Exiting program.");
+        }
+
+        if (Path.GetExtension(bundleFilePath)?.ToLower() != ".bundle")
+        {
+            Console.WriteLine($"The provided file \"{bundleFilePath}\" is not a Unity bundle file. Exiting program.");
+        }
+
+        string gameCode;
+        string bundleFileName = Path.GetFileName(bundleFilePath);
+
+        /*if (bundleFileName.Contains(GAME_CODE_FF4, StringComparison.CurrentCultureIgnoreCase))
+        {
+            gameCode = GAME_CODE_FF4;
+        }
+        else if (bundleFileName.Contains(GAME_CODE_FF5, StringComparison.CurrentCultureIgnoreCase))
+        {
+            gameCode = GAME_CODE_FF5;
+        }
+        else*/ if (bundleFileName.Contains(GAME_CODE_FF6, StringComparison.CurrentCultureIgnoreCase))
+        {
+            gameCode = GAME_CODE_FF6;
+        }
+        else
+        {
+            // TODO: ask which FF game it is in case the bundle file was renamed
+            Console.WriteLine("Either this Final Fantasy VI Pixel Remaster BGM Unity bundle file was renamed or it's for one of the other Pixel Remaster games (which are not supported). Exiting program.");
             return;
         }
 
@@ -98,10 +131,20 @@ class Program
                     break;
             }
             
-            Console.WriteLine(); // skip lines so its cleaner
+            Console.WriteLine(); // skips a line so its cleaner
         } while (languageCharacterCode == null);
 
-        Conversion.InitializeDictionary(languageCharacterCode);
+        TrackNameParser parser;
+
+        try
+        {
+            parser = new TrackNameParser(gameCode, languageCharacterCode);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return;
+        }
 
         string romFileName;
 
@@ -147,10 +190,10 @@ class Program
                 continue;
             }
 
-            var match = Regex.Match(filename, "FF6_[0-9]+[abcde12]*(_[A-Z]{3})*");
+            var match = Regex.Match(filename, gameCode + "_[0-9]+[abcde12]*(_[A-Z]{3})*");
             string? msuName = null;
             
-            if (!match.Success || (msuName = Conversion.LookupName(match.Value)) == null)
+            if (!match.Success || (msuName = parser.LookupName(match.Value.Substring(4))) == null)
             {
                 Console.WriteLine($@"""{filename}"" is not part of the msu patch. Skipping.");
                 continue;

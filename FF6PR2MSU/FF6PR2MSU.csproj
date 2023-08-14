@@ -12,11 +12,12 @@
 
     <ItemGroup>
       <PackageReference Include="AssetsToοls" Version="1.0.1" />
+      <PackageReference Include="ini-parser" Version="2.5.2" />
       <PackageReference Include="VGAudio" Version="2.2.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="wav2msu.xml">
+      <EmbeddedResource Include="LookupTables.ini">
         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       </EmbeddedResource>
     </ItemGroup>
