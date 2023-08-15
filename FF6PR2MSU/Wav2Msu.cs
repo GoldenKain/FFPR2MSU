@@ -1,4 +1,4 @@
-﻿// This class is simply a conversion of the original author's code to C# and
+// This class is simply a conversion of the original author's code to C#
 // slightly adjusted so its functionalities could be called as functions instead
 // of a main and having it be ran as a program in and of itself. Thus, I do not
 // think it right to give myself any credit for the code contained in this class
@@ -6,10 +6,9 @@
 // (outside of removing some calls that I did not need for the purpose of this
 // program).
 //
-// As such, the original copyright information and the license of the original
-// code will be added below. In accordance with the original code's license, the
-// contents of THIS CLASS shall be made free to use and redistribute (as long as
-// the conditions listed below are met of course).
+// As such, and in accordance with the requirements of the MIT license, the 
+// original copyright information and the license of the original code will be
+// added below.
 //
 // ======================== ORIGINAL COPYRIGHT NOTICE ========================
 //
