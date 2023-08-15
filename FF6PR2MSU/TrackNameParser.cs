@@ -11,9 +11,10 @@ public class TrackNameParser
 
     /// <param name="gameCode">Game's code as </param>
     /// <param name="languageCode">Code of the language chosen by the user for the vocal tracks (applicable for FFVI only)</param>
-    public TrackNameParser(string gameCode, string languageCode = "")
+    public TrackNameParser(string gameCode, string? languageCode = null)
     {
         StreamReader? iniStream = null;
+        languageCode ??= string.Empty;
 
         try
         {
@@ -37,12 +38,9 @@ public class TrackNameParser
 
             foreach (var data in section.Keys)
             {
-                if (gameCode == Program.GAME_CODE_FF6)
+                if (gameCode == Program.GAME_CODE_FF6 && FF6_VOCAL_TRACK_KEYS.Any(c => data.KeyName.StartsWith(c) && c + languageCode != data.KeyName))
                 {
-                    if (FF6_VOCAL_TRACK_KEYS.Any(c => data.KeyName.StartsWith(c)) && !data.KeyName.EndsWith(languageCode))
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 var value = data.Value;
