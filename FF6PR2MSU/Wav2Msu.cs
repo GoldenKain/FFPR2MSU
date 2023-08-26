@@ -42,25 +42,12 @@ namespace FF6PR2MSU;
 /// </see>
 public class Wav2Msu
 {
-    public static bool Convert(string inputFile, string outputFile, long loop_point)
+    public static bool Convert(byte[] inputData, string outputFile, long loop_point)
     {
-        FileStream? input = null;
         FileStream? output = null;
 
         try
         {
-            try
-            {
-                input = System.IO.File.OpenRead(inputFile);
-
-                if (input == null)
-                    throw new Exception($"wav2msu: can't open {inputFile}");
-            }
-            catch
-            {
-                throw new Exception($"wav2msu: can't open {inputFile}");
-            }
-
             try
             {
                 output = System.IO.File.OpenWrite(outputFile);
@@ -73,7 +60,9 @@ public class Wav2Msu
                 throw new Exception($"wav2msu: can't open {outputFile}\n");
             }
 
-            if (Validate(input) == -1)
+            int dataSize = Validate(inputData);
+
+            if (dataSize == -1)
             {
                 throw new Exception("wav2msu: Input WAV data did not validate.");
             }
@@ -84,12 +73,7 @@ public class Wav2Msu
             loop_point = (int)loop_point;
             output.Write(BitConverter.GetBytes(loop_point));
 
-            byte[] c = new byte[1];
-
-            while (input.Read(c, 0, c.Length) > 0)
-            {
-                output.Write(c, 0, c.Length);
-            }
+            output.Write(inputData[(inputData.Length - dataSize)..]);
 
             return true;
         }
@@ -101,28 +85,29 @@ public class Wav2Msu
         finally
         {
             output?.Close();
-            input?.Close();
         }
     }
 
-    private static int Validate(FileStream inputFile)
+    private static int Validate(byte[] inputData)
     {
+        int offset = 0;
         byte[] riff_header = new byte[4];
 
         // Check riff header and endianness ('RIFF' = little-endian)
-        if (inputFile.Read(riff_header, 0, riff_header.Length) != 4 || BitConverter.ToInt32(riff_header) != 0x46464952)
+
+        if (Read(inputData, ref riff_header, ref offset, riff_header.Length) != 4 || BitConverter.ToInt32(riff_header) != 0x46464952)
         {
             Console.WriteLine("wav2msu: Incorrect header: Invalid format or endianness\n");
             Console.WriteLine("         Value was: 0x%x\n", BitConverter.ToInt32(riff_header));
             return -1;
         }
 
-        inputFile.Seek(20, SeekOrigin.Begin);
+        offset = 20;
 
         // Format has to be PCM (=1)
         byte[] format = new byte[2];
 
-        if (inputFile.Read(format, 0, format.Length) != 2 || BitConverter.ToInt16(format) != 1)
+        if (Read(inputData, ref format, ref offset, format.Length) != 2 || BitConverter.ToInt16(format) != 1)
         {
             Console.WriteLine("wav2msu: Not in PCM format! (format was: %d)\n", BitConverter.ToInt16(format));
             return -1;
@@ -131,17 +116,17 @@ public class Wav2Msu
         // The data needs to be in stereo format
         byte[] channels = new byte[2];
 
-        inputFile.Read(channels, 0, channels.Length);
+        Read(inputData, ref channels, ref offset, channels.Length);
 
         // Sample Rate has to be 44.1kHz
         byte[] sample_rate = new byte[4];
-        inputFile.Read(sample_rate, 0, sample_rate.Length);
+        Read(inputData, ref sample_rate, ref offset, sample_rate.Length);
 
-        inputFile.Seek(34, SeekOrigin.Begin);
+        offset = 34;
 
         // We need 16bps
         byte[] bits_per_sample = new byte[2];
-        inputFile.Read(bits_per_sample, 0, bits_per_sample.Length);
+        Read(inputData, ref bits_per_sample, ref offset, bits_per_sample.Length);
 
         if (BitConverter.ToInt16(channels) != 2 || BitConverter.ToInt32(sample_rate) != 44100 || BitConverter.ToInt16(bits_per_sample) != 16)
         {
@@ -152,7 +137,7 @@ public class Wav2Msu
 
         // 'DATA'
         byte[] data_header = new byte[4];
-        inputFile.Read(data_header, 0, data_header.Length);
+        Read(inputData, ref data_header, ref offset, data_header.Length);
 
         if (BitConverter.ToInt32(data_header) != 0x61746164)
         {
@@ -161,8 +146,30 @@ public class Wav2Msu
         }
         
         byte[] data_size = new byte[4];
-        inputFile.Read(data_size, 0, data_size.Length);
+        Read(inputData, ref data_size, ref offset, data_size.Length);
 
         return BitConverter.ToInt32(data_size);
+    }
+
+    /**
+     * <summary>"Reads" the requested number of bytes from the input (if possible) and copies the results in the output. Made to closely match the signature of FileStream.Read().</summary>
+     * <param name="input">Input array that is to be read</param>
+     * <param name="output">Reference of the output array. The read data will be copied in that array, thus, it must already have been initialized</param>
+     * <param name="offset">Point at which the input array with be read (a.k.a. the offset)</param>
+     * <param name="length">Number of bytes to be read from the input array</param>
+     * <returns>The number of bytes that <i>could</i> be read from the input byte array</returns>
+     **/
+    private static int Read(byte[] input, ref byte[] output, ref int offset, int length)
+    {
+        if (input.Length < offset)
+            return -1;
+
+        if (input.Length < offset + length)
+            length -= offset + length - input.Length;
+
+        Array.Copy(input, offset, output, 0, length);
+
+        offset += length;
+        return length;
     }
 }

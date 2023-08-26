@@ -398,9 +398,15 @@ FodyWeavers.xsd
 *.sln.iml
 .idea/
 
+# Visual Studio launch settings
+Properties/
+
 # Utility files or files for personal use
 *.dll
 *.exe
 *.out
 *.wav
 *.pcm
+*/tmp
+*.bat
+*.sh

@@ -4,6 +4,8 @@ namespace FF6PR2MSU;
 
 public class TrackNameParser
 {
+    private const string LOOKUP_TABLES_FILE_NAME = "LookupTables.ini";
+
     // Haven't found a more graceful way to check which keys have different languages' vocals
     private static readonly string[] FF6_VOCAL_TRACK_KEYS = { "32b", "33", "34c" };
 
@@ -18,7 +20,12 @@ public class TrackNameParser
 
         try
         {
-            iniStream = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("FF6PR2MSU.LookupTables.ini"));
+            if (!File.Exists(LOOKUP_TABLES_FILE_NAME))
+            {
+                throw new Exception($"{LOOKUP_TABLES_FILE_NAME} could not be found.");
+            }
+
+            iniStream = new StreamReader(LOOKUP_TABLES_FILE_NAME);
 
             if (iniStream == null)
             {
@@ -69,7 +76,7 @@ public class TrackNameParser
     {
         if (!wav2msuTable.TryGetValue(gameTrackCode, out string? pcmNumber))
         {
-            return pcmNumber;
+            return null;
         }
 
         return pcmNumber;
