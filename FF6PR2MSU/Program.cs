@@ -25,11 +25,13 @@ class Program
         if (!File.Exists(bundleFilePath))
         {
             Console.WriteLine($"Could not find the file \"{bundleFilePath}\". Exiting program.");
+            return;
         }
 
         if (Path.GetExtension(bundleFilePath)?.ToLower() != ".bundle")
         {
             Console.WriteLine($"The provided file \"{bundleFilePath}\" is not a Unity bundle file. Exiting program.");
+            return;
         }
 
         string gameCode;

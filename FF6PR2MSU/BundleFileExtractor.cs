@@ -28,7 +28,7 @@ public class BundleFileExtractor
         assetName = null;
         assetData = null;
 
-        if (index >= assets.Count)
+        if (index < 0 || index >= assets.Count)
         {
             return false;
         }
