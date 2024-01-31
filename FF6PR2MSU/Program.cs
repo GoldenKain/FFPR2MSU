@@ -149,10 +149,12 @@ class Program
 
         for (int i = 0; bundle.GetAsset(i, out string name, out byte[] data); i++)
         {
-            var match = Regex.Match(name, gameCode + "_[0-9]+[abcde12]*(_[A-Z]{3})*");
+            Match match;
             string msuName;
             
-            if (!match.Success || (msuName = parser.LookupName(match.Value.Substring(4))) == null)
+            if (name.Contains("_original")
+            || !(match = Regex.Match(name, gameCode + "_[0-9]+[abcde12]*(_[A-Z]{3})*")).Success
+            || (msuName = parser.LookupName(match.Value.Substring(4))) == null)
             {
                 Console.WriteLine($@"""{name}"" is not part of the msu patch. Skipping.");
                 continue;
