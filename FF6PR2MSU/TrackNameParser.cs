@@ -1,4 +1,4 @@
-using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace FF6PR2MSU;
 
@@ -6,17 +6,20 @@ public class TrackNameParser
 {
     private const string LOOKUP_TABLES_FILE_NAME = "LookupTables.ini";
 
-    // Haven't found a more graceful way to check which keys have different languages' vocals
-    private static readonly string[] FF6_VOCAL_TRACK_KEYS = { "32b", "33", "34c" };
+    // 32b, 33 and 34c are the only FF6 tracks with lyrics that are part of the patch
+    private const string TRACK_NAME_LOOKUP_PATTERN = @"(?<={0}_)(?((32b|33|34c))[0-9]+[a-e12]*{1}|[0-9]+[a-e12]*)(?=\.)";
 
     private readonly Dictionary<string, string> wav2msuTable;
 
+    private readonly Regex lookupPattern;
+
     /// <param name="gameCode">Game's code as </param>
     /// <param name="languageCode">Code of the language chosen by the user for the vocal tracks (applicable for FFVI only)</param>
-    public TrackNameParser(string gameCode, string? languageCode = null)
+    public TrackNameParser(string gameCode, string languageCode = null)
     {
-        StreamReader? iniStream = null;
-        languageCode ??= string.Empty;
+        this.lookupPattern = new Regex(string.Format(TRACK_NAME_LOOKUP_PATTERN, gameCode, languageCode ?? string.Empty));
+
+        StreamReader iniStream = null;
 
         try
         {
@@ -45,11 +48,6 @@ public class TrackNameParser
 
             foreach (var data in section.Keys)
             {
-                if (gameCode == Program.GAME_CODE_FF6 && FF6_VOCAL_TRACK_KEYS.Any(c => data.KeyName.StartsWith(c) && c + languageCode != data.KeyName))
-                {
-                    continue;
-                }
-
                 var value = data.Value;
 
                 // APPARENTLY... the parser can't understand comment characters when used at the end of lines... So I have to handle them myself.
@@ -69,16 +67,15 @@ public class TrackNameParser
         finally
         {
             iniStream?.Close();
+            iniStream?.Dispose();
         }
     }
 
-    public string LookupName(string gameTrackCode)
+    public bool LookupName(string gameTrackCode, out string msuTrackCode)
     {
-        if (!wav2msuTable.TryGetValue(gameTrackCode, out string? pcmNumber))
-        {
-            return null;
-        }
+        msuTrackCode = null;
+        Match match = lookupPattern.Match(gameTrackCode);
 
-        return pcmNumber;
+        return match.Success && wav2msuTable.TryGetValue(match.Value, out msuTrackCode);
     }
 }

@@ -44,13 +44,13 @@ public class Wav2Msu
 {
     public static bool Convert(byte[] inputData, string outputFile, long loop_point)
     {
-        FileStream? output = null;
+        FileStream output = null;
 
         try
         {
             try
             {
-                output = System.IO.File.OpenWrite(outputFile);
+                output = File.OpenWrite(outputFile);
 
                 if (output == null)
                     throw new Exception();
@@ -85,6 +85,7 @@ public class Wav2Msu
         finally
         {
             output?.Close();
+            output?.Dispose();
         }
     }
 
@@ -98,7 +99,7 @@ public class Wav2Msu
         if (Read(inputData, ref riff_header, ref offset, riff_header.Length) != 4 || BitConverter.ToInt32(riff_header) != 0x46464952)
         {
             Console.WriteLine("wav2msu: Incorrect header: Invalid format or endianness\n");
-            Console.WriteLine("         Value was: 0x%x\n", BitConverter.ToInt32(riff_header));
+            Console.WriteLine($"         Value was: 0x{BitConverter.ToInt32(riff_header):x}\n");
             return -1;
         }
 
@@ -109,7 +110,7 @@ public class Wav2Msu
 
         if (Read(inputData, ref format, ref offset, format.Length) != 2 || BitConverter.ToInt16(format) != 1)
         {
-            Console.WriteLine("wav2msu: Not in PCM format! (format was: %d)\n", BitConverter.ToInt16(format));
+            Console.WriteLine($"wav2msu: Not in PCM format! (format was: {BitConverter.ToInt16(format):d})\n");
             return -1;
         }
 
@@ -131,7 +132,7 @@ public class Wav2Msu
         if (BitConverter.ToInt16(channels) != 2 || BitConverter.ToInt32(sample_rate) != 44100 || BitConverter.ToInt16(bits_per_sample) != 16)
         {
             Console.WriteLine("wav2msu: Not in 16bit 44.1kHz stereo!\n");
-            Console.WriteLine("         Got instead: %dbit, %dHz, %dch\n", bits_per_sample, sample_rate, channels);
+            Console.WriteLine($"         Got instead: {BitConverter.ToInt16(bits_per_sample):d}bit, {BitConverter.ToInt32(sample_rate):d}Hz, {BitConverter.ToInt16(channels):d}ch\n");
             return -1;
         }
 

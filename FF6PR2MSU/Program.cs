@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using VGAudio.Containers.Wave;
 using VGAudio.Formats;
 
@@ -14,7 +13,7 @@ class Program
 
     public static void Main(string[] args)
     {
-        if (args.Length == 0 || args.Any(a => a.Contains("-h") || a.Contains("--help") || a.Contains("/?")))
+        if (args.Length == 0 || args.Any(a => a == "-h" || a == "--help" || a == "/?"))
         {
             PrintMan();
             return;
@@ -37,15 +36,15 @@ class Program
         string gameCode;
         string bundleFileName = Path.GetFileName(bundleFilePath);
 
-        /*if (bundleFileName.Contains(GAME_CODE_FF4, StringComparison.CurrentCultureIgnoreCase))
+        /*if (bundleFileName.Contains(GAME_CODE_FF4, StringComparison.InvariantCultureIgnoreCase))
         {
             gameCode = GAME_CODE_FF4;
         }
-        else if (bundleFileName.Contains(GAME_CODE_FF5, StringComparison.CurrentCultureIgnoreCase))
+        else if (bundleFileName.Contains(GAME_CODE_FF5, StringComparison.InvariantCultureIgnoreCase))
         {
             gameCode = GAME_CODE_FF5;
         }
-        else*/ if (bundleFileName.Contains(GAME_CODE_FF6, StringComparison.CurrentCultureIgnoreCase))
+        else*/ if (bundleFileName.Contains(GAME_CODE_FF6, StringComparison.InvariantCultureIgnoreCase))
         {
             gameCode = GAME_CODE_FF6;
         }
@@ -68,7 +67,7 @@ class Program
             return;
         }
 
-        string? languageCharacterCode = null;
+        string languageCharacterCode = null;
 
         if (gameCode == GAME_CODE_FF6)
         {
@@ -128,7 +127,7 @@ class Program
             return;
         }
 
-        string? romFileName = null;
+        string romFileName = null;
 
         do
         {
@@ -149,12 +148,7 @@ class Program
 
         for (int i = 0; bundle.GetAsset(i, out string name, out byte[] data); i++)
         {
-            Match match;
-            string msuName;
-            
-            if (name.Contains("_original")
-            || !(match = Regex.Match(name, gameCode + "_[0-9]+[abcde12]*(_[A-Z]{3})*")).Success
-            || (msuName = parser.LookupName(match.Value.Substring(4))) == null)
+            if (!parser.LookupName(name, out string msuName))
             {
                 Console.WriteLine($@"""{name}"" is not part of the msu patch. Skipping.");
                 continue;
