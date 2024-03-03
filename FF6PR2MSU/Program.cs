@@ -55,10 +55,10 @@ class Program
         }
 
 #if !TESTWAV
-        string gameCode;
+        string gameCode = null;
         string bundleFileName = Path.GetFileName(bundleFilePath);
 
-        /*if (bundleFileName.Contains(GAME_CODE_FF4, StringComparison.InvariantCultureIgnoreCase))
+        if (bundleFileName.Contains(GAME_CODE_FF4, StringComparison.InvariantCultureIgnoreCase))
         {
             gameCode = GAME_CODE_FF4;
         }
@@ -66,15 +66,37 @@ class Program
         {
             gameCode = GAME_CODE_FF5;
         }
-        else*/ if (bundleFileName.Contains(GAME_CODE_FF6, StringComparison.InvariantCultureIgnoreCase))
+        else if (bundleFileName.Contains(GAME_CODE_FF6, StringComparison.InvariantCultureIgnoreCase))
         {
             gameCode = GAME_CODE_FF6;
         }
         else
         {
-            // TODO: ask which FF game it is in case the bundle file was renamed
-            Console.WriteLine("Either this file was renamed, is not an expected BGM assets Unity bundle file or is for some unsupported game (only Final Fantasy VI Pixel Remaster is supported). Exiting program.");
-            return;
+            do
+            {
+                Console.WriteLine("The Pixel Remaster game the Unity bundle file is taken from could not be inferred from the file's name.\nPlease select the Final Fantasy Pixel Remaster game it's taken from to continue:");
+                Console.WriteLine("1 - Final Fantasy IV");
+                Console.WriteLine("2 - Final Fantasy V");
+                Console.WriteLine("3 - Final Fantasy VI (default)");
+
+                switch (Console.ReadLine()?.Trim())
+                {
+                    case "1":
+                        gameCode = GAME_CODE_FF4;
+                        break;
+                    case "2":
+                        gameCode = GAME_CODE_FF5;
+                        break;
+                    case "":
+                    case "3":
+                        gameCode = GAME_CODE_FF6;
+                        break;
+                    default:
+                        break;
+                }
+
+                Console.WriteLine(); // skips a line so its cleaner looking
+            } while(gameCode == null);
         }
 
         string languageCharacterCode = null;
@@ -83,7 +105,6 @@ class Program
         {
             do
             {
-                Console.WriteLine(); // skips a line so its cleaner looking
                 Console.WriteLine("Which language for the opera scenes?");
                 Console.WriteLine("1 - No voice/instrumental (default)");
                 Console.WriteLine("2 - Dutch");
@@ -122,6 +143,8 @@ class Program
                         languageCharacterCode = "_SPA";
                         break;
                 }
+
+                Console.WriteLine(); // skips a line so its cleaner looking
             } while (languageCharacterCode == null);
         }
 
@@ -149,6 +172,8 @@ class Program
                 romFileName = null;
                 Console.WriteLine("This file name contains invalid characters. Try again.");
             }
+
+            Console.WriteLine(); // skips a line so its cleaner looking
         } while (string.IsNullOrEmpty(romFileName));
 #endif
 
