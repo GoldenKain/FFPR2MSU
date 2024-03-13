@@ -23,12 +23,20 @@ public class TrackNameParser
 
         try
         {
-            if (!File.Exists(LOOKUP_TABLES_FILE_NAME))
+            string lookupTablePath = LOOKUP_TABLES_FILE_NAME;
+
+            // priority to the lookup table in the cwd
+            if (!File.Exists(lookupTablePath))
             {
-                throw new Exception($"{LOOKUP_TABLES_FILE_NAME} could not be found.");
+                lookupTablePath = Path.Join(AppContext.BaseDirectory, LOOKUP_TABLES_FILE_NAME);
+
+                if (!File.Exists(lookupTablePath))
+                {
+                    throw new Exception($"{LOOKUP_TABLES_FILE_NAME} could not be found.");
+                }                
             }
 
-            iniStream = new StreamReader(LOOKUP_TABLES_FILE_NAME);
+            iniStream = new StreamReader(lookupTablePath);
 
             if (iniStream == null)
             {

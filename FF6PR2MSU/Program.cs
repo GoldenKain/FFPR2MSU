@@ -9,7 +9,7 @@ class Program
     public const string GAME_CODE_FF5 = "FF5";
     public const string GAME_CODE_FF6 = "FF6";
 
-    private const string OUTPUT_DIRECTORY_PATH = "output"; // relative
+    private const string OUTPUT_DIRECTORY_PATH = "output"; // relative (cwd)
 
     public static void Main(string[] args)
     {
