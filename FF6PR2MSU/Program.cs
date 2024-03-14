@@ -64,7 +64,7 @@ class Program
         else
         {
             // TODO: ask which FF game it is in case the bundle file was renamed
-            Console.WriteLine("Either this Final Fantasy VI Pixel Remaster BGM Unity bundle file was renamed or it's from some other game (other Pixel Remaster games are not supported). Exiting program.");
+            Console.WriteLine("Either this file was renamed, is not an expected BGM assets Unity bundle file or is for some unsupported game (only Final Fantasy VI Pixel Remaster is supported). Exiting program.");
             return;
         }
 
