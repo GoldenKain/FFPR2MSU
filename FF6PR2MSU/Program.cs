@@ -42,7 +42,7 @@ class Program
 
         if (Path.GetExtension(bundleFilePath)?.ToLower() != ".bundle")
         {
-            Console.WriteLine($"The provided file \"{bundleFilePath}\" is not a Unity bundle file. Exiting program.");
+            Console.WriteLine($"The provided file \"{bundleFilePath}\" is not a valid Unity bundle file. Exiting program.");
             return;
         }
 
@@ -74,9 +74,9 @@ class Program
         {
             bundle = new BundleFileExtractor(bundleFilePath);
         }
-        catch
+        catch (Exception ex)
         {
-            Console.WriteLine("Bundle file not valid. Exiting program.");
+            Console.WriteLine(ex.Message + " Exiting program.");
             return;
         }
 

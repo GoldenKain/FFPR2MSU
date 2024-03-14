@@ -83,7 +83,7 @@ namespace FF6PR2MSU
             }
             
             if (innerFileStartOffset < 0)
-                throw new Exception("");
+                throw new Exception("Could not find start offset position of the audio material.");
 
             using var stream = new MemoryStream(fileBytes);
             using var reader = new BinaryReader(stream);

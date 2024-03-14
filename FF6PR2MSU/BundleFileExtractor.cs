@@ -19,7 +19,7 @@ public class BundleFileExtractor
 
         if (assets.Count <= 0)
         {
-            throw new Exception();
+            throw new Exception("No asset could be found in the Unity bundle file.");
         }
     }
 

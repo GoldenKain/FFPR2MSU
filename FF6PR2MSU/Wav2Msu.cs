@@ -57,7 +57,7 @@ public class Wav2Msu
             }
             catch
             {
-                throw new Exception($"wav2msu: can't open {outputFile}\n");
+                throw new Exception($"wav2msu: Can't open {outputFile}");
             }
 
             int dataSize = Validate(inputData);
