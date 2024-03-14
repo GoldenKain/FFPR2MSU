@@ -205,9 +205,8 @@ class Program
         Console.WriteLine(
             "=========+ Final Fantasy VI Pixel Remaster to MSU-1 conversion tool +========= \n" +
             "https://github.com/GoldenKain/FF6PR2MSU\n" + 
-            "How to use? Simply drag and drop the appropriate music .bundle file (file containing Unity assets) from the directory of the PC version of Final Fantasy VI Pixel Remaster and you should be good to go! Well... Almost...\n\n" +
-            "To work, this program also needs (for now at least...) the executable for AudioMog, a program that converts assets of Square Enix games to the desired files (in this case, wave audio files). Here's a link to their github page <https://github.com/Yoraiz0r/AudioMog>. You simply need to download the latest version of the program and extract the contents of the zip file in the same directory as FF6PR2MSU. \n" +
-            "Something else you might want to know, the name of the Unity bundle file for Final Fantasy VI Pixel Remaster is named \"ff6_bgm_assets_all_181eb630118efa8542dab51f7e8d2795.bundle\" or something to that effect. I imagine it's possible that the name of the file might change a little after some updates, but that part should stay the same: \"ff6_bgm_assets\". \n\n" +
+            "How to use? Drag and drop the appropriate BGM assets file (the game's Unity .bundle file containing background music assets) from the directory of the PC version of Final Fantasy VI Pixel Remaster.\n\n" +
+            "N.B.: At the time of writing this, the name of the Unity bundle file for Final Fantasy VI Pixel Remaster is named \"ff6_bgm_assets_all_2a6190d8b5232a0a02876b83e0f742cc.bundle\", but it's possible that it could be changed a after some updates. However, it's fair to assume that this part should stay the same: \"ff6_bgm_assets\".\n\n" +
             "For more information and full credits, please consult the project's Github page.");
     }
 }
