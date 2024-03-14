@@ -1,5 +1,9 @@
+#if TESTWAV
+using System.Text.RegularExpressions;
+#else
 using VGAudio.Containers.Wave;
 using VGAudio.Formats;
+#endif
 
 namespace FF6PR2MSU;
 
@@ -8,6 +12,10 @@ class Program
     public const string GAME_CODE_FF4 = "FF4";
     public const string GAME_CODE_FF5 = "FF5";
     public const string GAME_CODE_FF6 = "FF6";
+
+#if TESTWAV
+    private static readonly Regex SIMPLE_WAV_NAME_PATTERN = new Regex(@"(?<=SWAV_BGM_)\w+");
+#endif
 
     private static readonly string OUTPUT_DIRECTORY_PATH = "output"; // relative (cwd)
 
@@ -46,6 +54,7 @@ class Program
             return;
         }
 
+#if !TESTWAV
         string gameCode;
         string bundleFileName = Path.GetFileName(bundleFilePath);
 
@@ -65,18 +74,6 @@ class Program
         {
             // TODO: ask which FF game it is in case the bundle file was renamed
             Console.WriteLine("Either this file was renamed, is not an expected BGM assets Unity bundle file or is for some unsupported game (only Final Fantasy VI Pixel Remaster is supported). Exiting program.");
-            return;
-        }
-
-        BundleFileExtractor bundle;
-
-        try
-        {
-            bundle = new BundleFileExtractor(bundleFilePath);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message + " Exiting program.");
             return;
         }
 
@@ -153,6 +150,19 @@ class Program
                 Console.WriteLine("This file name contains invalid characters. Try again.");
             }
         } while (string.IsNullOrEmpty(romFileName));
+#endif
+
+        BundleFileExtractor bundle;
+
+        try
+        {
+            bundle = new BundleFileExtractor(bundleFilePath);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message + " Exiting program.");
+            return;
+        }
 
         try
         {
@@ -166,11 +176,13 @@ class Program
 
         for (int i = 0; bundle.GetAsset(i, out string name, out byte[] data); i++)
         {
+#if !TESTWAV
             if (!parser.LookupName(name, out string msuName))
             {
                 Console.WriteLine($@"""{name}"" is not part of the msu patch. Skipping.");
                 continue;
             }
+#endif
 
             byte[] convertedWaveAudioData;
 
@@ -184,6 +196,26 @@ class Program
                 continue;
             }
 
+#if TESTWAV
+            string wavName = name;
+
+            // Attempting to simplify output name
+            Match match = SIMPLE_WAV_NAME_PATTERN.Match(wavName);
+            if (match.Success)
+            {
+                wavName = match.Value;
+            }
+
+            try
+            {
+                File.WriteAllBytes(Path.Join(OUTPUT_DIRECTORY_PATH, wavName + ".wav"), convertedWaveAudioData);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+#else
             IAudioFormat format = new WaveReader().ReadFormat(convertedWaveAudioData);
 
             if (Wav2Msu.Convert(convertedWaveAudioData, Path.Join(OUTPUT_DIRECTORY_PATH, $"{romFileName}-{msuName}.pcm"), format.Looping ? format.LoopStart : 0))
@@ -198,6 +230,7 @@ class Program
 
         Console.WriteLine("MSU-1 audio files created successfully. Press RETURN to exit the program...");
         Console.ReadLine();
+#endif
     }
 
     private static void PrintMan()
