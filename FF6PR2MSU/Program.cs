@@ -9,7 +9,20 @@ class Program
     public const string GAME_CODE_FF5 = "FF5";
     public const string GAME_CODE_FF6 = "FF6";
 
-    private const string OUTPUT_DIRECTORY_PATH = "output"; // relative (cwd)
+    private static readonly string OUTPUT_DIRECTORY_PATH = "output"; // relative (cwd)
+
+    static Program()
+    {
+        int i = 0;
+        string outputDirPath = OUTPUT_DIRECTORY_PATH;
+
+        while (Directory.Exists(outputDirPath))
+        {
+            outputDirPath = OUTPUT_DIRECTORY_PATH + ++i;
+        }
+
+        OUTPUT_DIRECTORY_PATH = outputDirPath;
+    }
 
     public static void Main(string[] args)
     {
@@ -141,9 +154,14 @@ class Program
             }
         } while (string.IsNullOrEmpty(romFileName));
 
-        if (!Directory.Exists(OUTPUT_DIRECTORY_PATH))
+        try
         {
             Directory.CreateDirectory(OUTPUT_DIRECTORY_PATH);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            return;
         }
 
         for (int i = 0; bundle.GetAsset(i, out string name, out byte[] data); i++)
