@@ -13,7 +13,7 @@ public class TrackNameParser
 
     private readonly Regex lookupPattern;
 
-    /// <param name="gameCode">Game's code as </param>
+    /// <param name="gameCode">Game's 3-letter code</param> 
     /// <param name="languageCode">Code of the language chosen by the user for the vocal tracks (applicable for FFVI only)</param>
     public TrackNameParser(string gameCode, string languageCode = null)
     {

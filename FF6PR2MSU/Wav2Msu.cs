@@ -69,7 +69,7 @@ public class Wav2Msu
 
             output.Write(Encoding.ASCII.GetBytes("MSU1"));
 
-            // idk why we'd want to lose information to then write the same about of bytes anyways but... ok. :|
+            // idk why we'd want to lose information to then write the same amount of bytes anyways but... ok. :|
             loop_point = (int)loop_point;
             output.Write(BitConverter.GetBytes(loop_point));
 

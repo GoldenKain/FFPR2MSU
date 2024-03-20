@@ -239,7 +239,7 @@ class Program
             "=========+ Final Fantasy VI Pixel Remaster to MSU-1 conversion tool +========= \n" +
             "https://github.com/GoldenKain/FF6PR2MSU\n" + 
             "How to use? Drag and drop the appropriate BGM assets file (the game's Unity .bundle file containing background music assets) from the directory of the PC version of Final Fantasy VI Pixel Remaster.\n\n" +
-            "N.B.: At the time of writing this, the name of the Unity bundle file for Final Fantasy VI Pixel Remaster is named \"ff6_bgm_assets_all_2a6190d8b5232a0a02876b83e0f742cc.bundle\", but it's possible that it could be changed a after some updates. However, it's fair to assume that this part should stay the same: \"ff6_bgm_assets\".\n\n" +
+            "N.B.: At the time of writing this, the name of the Unity bundle file for Final Fantasy VI Pixel Remaster is named \"ff6_bgm_assets_all_2a6190d8b5232a0a02876b83e0f742cc.bundle\", but it's possible that it could change after an update. However, it's safe to assume that this part will stay the same: \"ff6_bgm_assets\".\n\n" +
             "For more information and full credits, please consult the project's Github page.");
     }
 }
