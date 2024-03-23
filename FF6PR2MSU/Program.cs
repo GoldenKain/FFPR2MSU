@@ -13,6 +13,8 @@ class Program
     public const string GAME_CODE_FF5 = "FF5";
     public const string GAME_CODE_FF6 = "FF6";
 
+    private const string MSU_FILE_NAME = "{0}-{1}.pcm";
+
 #if TESTWAV
     private static readonly Regex SIMPLE_WAV_NAME_PATTERN = new Regex(@"(?<=SWAV_BGM_)\w+");
 #endif
@@ -55,26 +57,48 @@ class Program
         }
 
 #if !TESTWAV
-        string gameCode;
+        string gameCode = null;
         string bundleFileName = Path.GetFileName(bundleFilePath);
 
-        /*if (bundleFileName.Contains(GAME_CODE_FF4, StringComparison.InvariantCultureIgnoreCase))
+        if (bundleFileName.Contains(GAME_CODE_FF4, StringComparison.InvariantCultureIgnoreCase))
         {
             gameCode = GAME_CODE_FF4;
         }
-        else if (bundleFileName.Contains(GAME_CODE_FF5, StringComparison.InvariantCultureIgnoreCase))
-        {
-            gameCode = GAME_CODE_FF5;
-        }
-        else*/ if (bundleFileName.Contains(GAME_CODE_FF6, StringComparison.InvariantCultureIgnoreCase))
+        // else if (bundleFileName.Contains(GAME_CODE_FF5, StringComparison.InvariantCultureIgnoreCase))
+        // {
+        //     gameCode = GAME_CODE_FF5;
+        // }
+        else if (bundleFileName.Contains(GAME_CODE_FF6, StringComparison.InvariantCultureIgnoreCase))
         {
             gameCode = GAME_CODE_FF6;
         }
         else
         {
-            // TODO: ask which FF game it is in case the bundle file was renamed
-            Console.WriteLine("Either this file was renamed, is not an expected BGM assets Unity bundle file or is for some unsupported game (only Final Fantasy VI Pixel Remaster is supported). Exiting program.");
-            return;
+            do
+            {
+                Console.WriteLine("The Pixel Remaster game the Unity bundle file is taken from could not be inferred from the file's name.\nPlease select the Final Fantasy Pixel Remaster game it's taken from to continue:");
+                Console.WriteLine("1 - Final Fantasy IV");
+                // Console.WriteLine("2 - Final Fantasy V");
+                Console.WriteLine("3 - Final Fantasy VI (default)");
+
+                switch (Console.ReadLine()?.Trim())
+                {
+                    case "1":
+                        gameCode = GAME_CODE_FF4;
+                        break;
+                    // case "2":
+                    //     gameCode = GAME_CODE_FF5;
+                    //     break;
+                    case "":
+                    case "3":
+                        gameCode = GAME_CODE_FF6;
+                        break;
+                    default:
+                        break;
+                }
+
+                Console.WriteLine(); // skips a line so its cleaner looking
+            } while(gameCode == null);
         }
 
         string languageCharacterCode = null;
@@ -83,7 +107,6 @@ class Program
         {
             do
             {
-                Console.WriteLine(); // skips a line so its cleaner looking
                 Console.WriteLine("Which language for the opera scenes?");
                 Console.WriteLine("1 - No voice/instrumental (default)");
                 Console.WriteLine("2 - Dutch");
@@ -122,6 +145,8 @@ class Program
                         languageCharacterCode = "_SPA";
                         break;
                 }
+
+                Console.WriteLine(); // skips a line so its cleaner looking
             } while (languageCharacterCode == null);
         }
 
@@ -141,7 +166,14 @@ class Program
 
         do
         {
-            Console.WriteLine("\nName of the rom (without extension)?");
+            Console.WriteLine(
+                "\nName of the {0} rom file (without extension)?",
+                gameCode switch {
+                    GAME_CODE_FF4 => "Final Fantasy IV",
+                    // GAME_CODE_FF5 => "Final Fantasy V",
+                    GAME_CODE_FF6 => "Final Fantasy VI",
+                    _ => string.Empty
+                });
             romFileName = Console.ReadLine()?.TrimEnd();
 
             if (Path.GetInvalidFileNameChars().Any(c => (romFileName ?? string.Empty).Contains(c)))
@@ -149,6 +181,8 @@ class Program
                 romFileName = null;
                 Console.WriteLine("This file name contains invalid characters. Try again.");
             }
+
+            Console.WriteLine(); // skips a line so its cleaner looking
         } while (string.IsNullOrEmpty(romFileName));
 #endif
 
@@ -177,9 +211,15 @@ class Program
         for (int i = 0; bundle.GetAsset(i, out string name, out byte[] data); i++)
         {
 #if !TESTWAV
-            if (!parser.LookupName(name, out string msuName))
+            if (!parser.LookupName(name, out List<string> msuNames, out string sanitizedGameTrackCode))
             {
                 Console.WriteLine($@"""{name}"" is not part of the msu patch. Skipping.");
+                continue;
+            }
+
+            if (msuNames == null || msuNames.Count <= 0)
+            {
+                Console.WriteLine($@"There seems to be a formatting error in the lookup table around the line for track ""{sanitizedGameTrackCode}"" in section ""[{gameCode}]"". Skipping.");
                 continue;
             }
 #endif
@@ -218,8 +258,22 @@ class Program
 #else
             IAudioFormat format = new WaveReader().ReadFormat(convertedWaveAudioData);
 
-            if (Wav2Msu.Convert(convertedWaveAudioData, Path.Join(OUTPUT_DIRECTORY_PATH, $"{romFileName}-{msuName}.pcm"), format.Looping ? format.LoopStart : 0))
+            string convertedMsuFileName0 = Path.Join(OUTPUT_DIRECTORY_PATH, string.Format(MSU_FILE_NAME, romFileName, msuNames[0]));
+
+            if (Wav2Msu.Convert(convertedWaveAudioData, convertedMsuFileName0, format.Looping ? format.LoopStart : 0))
             {
+                for (int j = 1; j < msuNames.Count; j++)
+                {
+                    try
+                    {
+                        File.Copy(convertedMsuFileName0, Path.Join(OUTPUT_DIRECTORY_PATH, string.Format(MSU_FILE_NAME, romFileName, msuNames[j])));
+                    }
+                    catch
+                    {
+                        // I guess just skipping for now? It really shouldn't happen if the first one worked well... We should have read/write permissions and everything.
+                    }
+                }
+
                 Console.WriteLine($@"""{name}"" has been converted successfully.");
             }
             else
