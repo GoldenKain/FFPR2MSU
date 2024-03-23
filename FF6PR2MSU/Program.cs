@@ -211,15 +211,9 @@ class Program
         for (int i = 0; bundle.GetAsset(i, out string name, out byte[] data); i++)
         {
 #if !TESTWAV
-            if (!parser.LookupName(name, out List<string> msuNames, out string sanitizedGameTrackCode))
+            if (!parser.LookupName(name, out string[] msuNames))
             {
                 Console.WriteLine($@"""{name}"" is not part of the msu patch. Skipping.");
-                continue;
-            }
-
-            if (msuNames == null || msuNames.Count <= 0)
-            {
-                Console.WriteLine($@"There seems to be a formatting error in the lookup table around the line for track ""{sanitizedGameTrackCode}"" in section ""[{gameCode}]"". Skipping.");
                 continue;
             }
 #endif
@@ -262,7 +256,7 @@ class Program
 
             if (Wav2Msu.Convert(convertedWaveAudioData, convertedMsuFileName0, format.Looping ? format.LoopStart : 0))
             {
-                for (int j = 1; j < msuNames.Count; j++)
+                for (int j = 1; j < msuNames.Length; j++)
                 {
                     try
                     {
