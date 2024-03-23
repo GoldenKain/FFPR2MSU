@@ -64,10 +64,10 @@ class Program
         {
             gameCode = GAME_CODE_FF4;
         }
-        else if (bundleFileName.Contains(GAME_CODE_FF5, StringComparison.InvariantCultureIgnoreCase))
-        {
-            gameCode = GAME_CODE_FF5;
-        }
+        // else if (bundleFileName.Contains(GAME_CODE_FF5, StringComparison.InvariantCultureIgnoreCase))
+        // {
+        //     gameCode = GAME_CODE_FF5;
+        // }
         else if (bundleFileName.Contains(GAME_CODE_FF6, StringComparison.InvariantCultureIgnoreCase))
         {
             gameCode = GAME_CODE_FF6;
@@ -78,7 +78,7 @@ class Program
             {
                 Console.WriteLine("The Pixel Remaster game the Unity bundle file is taken from could not be inferred from the file's name.\nPlease select the Final Fantasy Pixel Remaster game it's taken from to continue:");
                 Console.WriteLine("1 - Final Fantasy IV");
-                Console.WriteLine("2 - Final Fantasy V");
+                // Console.WriteLine("2 - Final Fantasy V");
                 Console.WriteLine("3 - Final Fantasy VI (default)");
 
                 switch (Console.ReadLine()?.Trim())
@@ -86,9 +86,9 @@ class Program
                     case "1":
                         gameCode = GAME_CODE_FF4;
                         break;
-                    case "2":
-                        gameCode = GAME_CODE_FF5;
-                        break;
+                    // case "2":
+                    //     gameCode = GAME_CODE_FF5;
+                    //     break;
                     case "":
                     case "3":
                         gameCode = GAME_CODE_FF6;
@@ -166,7 +166,14 @@ class Program
 
         do
         {
-            Console.WriteLine("\nName of the rom (without extension)?");
+            Console.WriteLine(
+                "\nName of the {0} rom file (without extension)?",
+                gameCode switch {
+                    GAME_CODE_FF4 => "Final Fantasy IV",
+                    // GAME_CODE_FF5 => "Final Fantasy V",
+                    GAME_CODE_FF6 => "Final Fantasy VI",
+                    _ => string.Empty
+                });
             romFileName = Console.ReadLine()?.TrimEnd();
 
             if (Path.GetInvalidFileNameChars().Any(c => (romFileName ?? string.Empty).Contains(c)))
