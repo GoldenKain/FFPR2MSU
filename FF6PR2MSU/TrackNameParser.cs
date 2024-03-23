@@ -9,7 +9,7 @@ public class TrackNameParser
     // 32b, 33 and 34c are the only FF6 tracks with lyrics that are part of the patch
     private const string TRACK_NAME_LOOKUP_PATTERN = @"(?<={0}_)(?((32b|33|34c))[0-9]+[a-e12]*{1}|[0-9]+[a-e12]*)(?=\.)";
 
-    private readonly Dictionary<string, string> wav2msuTable;
+    private readonly Dictionary<string, List<string>> wav2msuTable;
 
     private readonly Regex lookupPattern;
 
@@ -52,20 +52,32 @@ public class TrackNameParser
             }
 
             // Copying data in a Dictionary just because it's simpler to use
-            this.wav2msuTable = new Dictionary<string, string>();
+            this.wav2msuTable = new Dictionary<string, List<string>>();
 
             foreach (var data in section.Keys)
             {
-                var value = data.Value;
-
                 // APPARENTLY... the parser can't understand comment characters when used at the end of lines... So I have to handle them myself.
                 // What's the point of using an external library if it won't even properly parse the data...? Might as well redo it myself. TBD.
-                if (value.Contains(';'))
+                if (data.Value.Contains(';'))
                 {
-                    value = value.Remove(value.IndexOf(';')).Trim();
+                    data.Value = data.Value.Remove(data.Value.IndexOf(';')).Trim();
                 }
 
-                wav2msuTable.Add(data.KeyName, value);
+                string[] values = data.Value.Split('|', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+                if (values == null || values.Length <= 0)
+                {
+                    continue;
+                }
+
+                if (wav2msuTable.TryGetValue(data.KeyName, out List<string> tracks))
+                {
+                    tracks.AddRange(values);
+                }
+                else
+                {
+                    wav2msuTable.Add(data.KeyName, new List<string>(values));
+                }
             }
         }
         catch
@@ -79,11 +91,12 @@ public class TrackNameParser
         }
     }
 
-    public bool LookupName(string gameTrackCode, out string msuTrackCode)
+    public bool LookupName(string gameTrackCode, out List<string> msuTrackCodes, out string sanitizedGameTrackCode)
     {
-        msuTrackCode = null;
+        msuTrackCodes = null;
+        sanitizedGameTrackCode = null;
         Match match = lookupPattern.Match(gameTrackCode);
 
-        return match.Success && wav2msuTable.TryGetValue(match.Value, out msuTrackCode);
+        return match.Success && wav2msuTable.TryGetValue(sanitizedGameTrackCode = match.Value, out msuTrackCodes);
     }
 }

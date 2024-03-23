@@ -13,6 +13,8 @@ class Program
     public const string GAME_CODE_FF5 = "FF5";
     public const string GAME_CODE_FF6 = "FF6";
 
+    private const string MSU_FILE_NAME = "{0}-{1}.pcm";
+
 #if TESTWAV
     private static readonly Regex SIMPLE_WAV_NAME_PATTERN = new Regex(@"(?<=SWAV_BGM_)\w+");
 #endif
@@ -202,9 +204,15 @@ class Program
         for (int i = 0; bundle.GetAsset(i, out string name, out byte[] data); i++)
         {
 #if !TESTWAV
-            if (!parser.LookupName(name, out string msuName))
+            if (!parser.LookupName(name, out List<string> msuNames, out string sanitizedGameTrackCode))
             {
                 Console.WriteLine($@"""{name}"" is not part of the msu patch. Skipping.");
+                continue;
+            }
+
+            if (msuNames == null || msuNames.Count <= 0)
+            {
+                Console.WriteLine($@"There seems to be a formatting error in the lookup table around the line for track ""{sanitizedGameTrackCode}"" in section ""[{gameCode}]"". Skipping.");
                 continue;
             }
 #endif
@@ -243,8 +251,22 @@ class Program
 #else
             IAudioFormat format = new WaveReader().ReadFormat(convertedWaveAudioData);
 
-            if (Wav2Msu.Convert(convertedWaveAudioData, Path.Join(OUTPUT_DIRECTORY_PATH, $"{romFileName}-{msuName}.pcm"), format.Looping ? format.LoopStart : 0))
+            string convertedMsuFileName0 = Path.Join(OUTPUT_DIRECTORY_PATH, string.Format(MSU_FILE_NAME, romFileName, msuNames[0]));
+
+            if (Wav2Msu.Convert(convertedWaveAudioData, convertedMsuFileName0, format.Looping ? format.LoopStart : 0))
             {
+                for (int j = 1; j < msuNames.Count; j++)
+                {
+                    try
+                    {
+                        File.Copy(convertedMsuFileName0, Path.Join(OUTPUT_DIRECTORY_PATH, string.Format(MSU_FILE_NAME, romFileName, msuNames[j])));
+                    }
+                    catch
+                    {
+                        // I guess just skipping for now? It really shouldn't happen if the first one worked well... We should have read/write permissions and everything.
+                    }
+                }
+
                 Console.WriteLine($@"""{name}"" has been converted successfully.");
             }
             else
