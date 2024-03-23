@@ -7,7 +7,7 @@ FFPR2MSU is a tool that extracts the audio files from the PC version of the Fina
 - [Dizzy611](../../../../Dizzy611)'s [DancingMadFF6](../../../../Dizzy611/DancingMadFF6) for Final Fantasy III/VI.
 
 > [!NOTE]
-> I will <b><i>NOT</i></b> share the audio files themselves. The files are under copyright, thus sharing them around would be illegal. You will need to supply your own music asset file (in this case, a Unity bundle file) from the PC version of the Final Fantasy Pixel Remaster game in question.
+> I will ___NOT___ share the audio files themselves. The files are under copyright, thus sharing them around would be illegal. You will need to supply your own music asset file (in this case, a Unity bundle file) from the PC version of the Final Fantasy Pixel Remaster game in question.
 
 ## SETUP AND HOW TO USE
 
