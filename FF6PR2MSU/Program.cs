@@ -211,6 +211,34 @@ class Program
         for (int i = 0; bundle.GetAsset(i, out string name, out byte[] data); i++)
         {
 #if !TESTWAV
+            // Remove this section if instrumentals for 32b and 34c ever get fixed in FF6PR... FROM HERE --->
+            int startOffset = 0;
+            int? length = null;
+
+            if (gameCode == GAME_CODE_FF6 && string.IsNullOrEmpty(languageCharacterCode))
+            {
+                if (name.Contains("_32b.") || name.Contains("_34c."))
+                {
+                    Console.WriteLine($@"""{name}"" is not part of the msu patch. Skipping.");
+                    continue;
+                }
+
+                if (name.Contains("_32."))
+                {
+                    // 4428220 and 1888037 are hardcoded because they're only used once and a bodge fix...
+                    name = name.Replace("32", "32b");
+                    startOffset = 4428220;
+                    length = 1888037;
+                }
+                else if (name.Contains("_34."))
+                {
+                    // 6496108 and 1832045 are hardcoded because they're only used once and a bodge fix...
+                    name = name.Replace("34", "34c");
+                    startOffset = 6496108;
+                    length = 1832045;
+                }
+            } // <--- TO HERE
+
             if (!parser.LookupName(name, out string[] msuNames))
             {
                 Console.WriteLine($@"""{name}"" is not part of the msu patch. Skipping.");
@@ -254,7 +282,7 @@ class Program
 
             string convertedMsuFileName0 = Path.Join(OUTPUT_DIRECTORY_PATH, string.Format(MSU_FILE_NAME, romFileName, msuNames[0]));
 
-            if (Wav2Msu.Convert(convertedWaveAudioData, convertedMsuFileName0, format.Looping ? format.LoopStart : 0))
+            if (Wav2Msu.Convert(convertedWaveAudioData, convertedMsuFileName0, format.Looping ? format.LoopStart : 0, startOffset, length))
             {
                 for (int j = 1; j < msuNames.Length; j++)
                 {

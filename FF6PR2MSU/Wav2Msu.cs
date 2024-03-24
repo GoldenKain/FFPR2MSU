@@ -42,7 +42,7 @@ namespace FF6PR2MSU;
 /// </see>
 public class Wav2Msu
 {
-    public static bool Convert(byte[] inputData, string outputFile, long loop_point)
+    public static bool Convert(byte[] inputData, string outputFile, long loop_point, int startOffset = 0, int? length = null)
     {
         FileStream output = null;
 
@@ -73,7 +73,11 @@ public class Wav2Msu
             loop_point = (int)loop_point;
             output.Write(BitConverter.GetBytes(loop_point));
 
-            output.Write(inputData[(inputData.Length - dataSize)..]);
+            // "* 4" because the samples are 16-bit but here we're working in bytes (8-bit) and it's in stereo (so 2 voices).
+            output.Write(
+                length != null
+                ? inputData.AsSpan(inputData.Length - dataSize + (startOffset * 4), length.Value * 4)
+                : inputData.AsSpan(inputData.Length - dataSize + (startOffset * 4)));
 
             return true;
         }
@@ -145,7 +149,7 @@ public class Wav2Msu
             Console.WriteLine("wav2msu: Sample data not where expected!\n");
             return -1;
         }
-        
+
         byte[] data_size = new byte[4];
         Read(inputData, ref data_size, ref offset, data_size.Length);
 
