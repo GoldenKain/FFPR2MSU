@@ -37,7 +37,7 @@ FFPR2MSU is a tool that extracts the audio files from the PC version of the Fina
      1. From user's [Dizzy611](../../../../Dizzy611)'s [DancingMadFF6](../../../../Dizzy611/DancingMadFF6) repository here on Github, download the [.ips file](../../../../Dizzy611/DancingMadFF6/tree/master/patch/ff3msu.ips) and the [.msu file](../../../../Dizzy611/DancingMadFF6/tree/master/patch/ff3msu.msu). If the links are broken, at the time of writing this, they are located in the ["patch" folder on the master branch](../../../../Dizzy611/DancingMadFF6/tree/master/patch).
 
    </details>
-3. Patch your rom with the corresponding .ips patch file with the help of some rom patching program like [Flips](https://www.romhacking.net/utilities/1040/) or [Lunar IPS](https://www.romhacking.net/utilities/240/).
+3. Patch your rom with the corresponding .ips patch file with the help of some rom patching program like the [Advanced SNES ROM Utility](https://www.romhacking.net/utilities/1638/), [Flips](https://www.romhacking.net/utilities/1040/) or [Lunar IPS](https://www.romhacking.net/utilities/240/).
 4. To save yourself the headache of having to rename dozens of files later on, make sure that the msu file and the pached rom have the same name (be careful not to inadvertently change the file extensions).
 5. From the corresponding Final Fantasy Pixel Remaster Steam install folder, find the .bundle background music asset file and keep it close, you'll need it soon. It should be named something like: "ff`corresponding-game-number`\_bgm\_assets_all\_`series-of-numbers-and-letters`.bundle".
 6. Download the [latest release](releases/latest) of the program or compile it from source. Make sure to keep the ini file in the same directory as the executable.
@@ -57,7 +57,7 @@ FFPR2MSU is a tool that extracts the audio files from the PC version of the Fina
    FF6PR2MSU "path/to/the/bundle/file"
    ```
 
-8. You should now have a bunch of .pcm files in a folder named "output" located in the same directory as the program. Now, simply place all of those and the rom you patched in your location of choice (either an FX Pak Pro or some emulator that supports the MSU-1).
+8. You should now have a bunch of .pcm files in a folder named "output" located in the same directory as your bundle file (or in your current work directory if you ran the command in your command line interface). Now, simply place all of those and the rom you patched in your location of choice (either an FX Pak Pro or some emulator that supports the MSU-1). For more information on the MSU-1 and how to set it up, I highly recommend reading up [this guide on the Zeldix forums](https://www.zeldix.net/t1607-msu1-getting-started-guide).
 
 ## FAQ
 
