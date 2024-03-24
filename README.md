@@ -40,7 +40,7 @@ FFPR2MSU is a tool that extracts the audio files from the PC version of the Fina
 3. Patch your rom with the corresponding .ips patch file with the help of some rom patching program like the [Advanced SNES ROM Utility](https://www.romhacking.net/utilities/1638/), [Flips](https://www.romhacking.net/utilities/1040/) or [Lunar IPS](https://www.romhacking.net/utilities/240/).
 4. To save yourself the headache of having to rename dozens of files later on, make sure that the msu file and the pached rom have the same name (be careful not to inadvertently change the file extensions).
 5. From the corresponding Final Fantasy Pixel Remaster Steam install folder, find the .bundle background music asset file and keep it close, you'll need it soon. It should be named something like: "ff`corresponding-game-number`\_bgm\_assets_all\_`series-of-numbers-and-letters`.bundle".
-6. Download the [latest release](releases/latest) of the program or compile it from source. Make sure to keep the ini file in the same directory as the executable.
+6. Download the [latest release](../../releases/latest) of the program or compile it from source. Make sure to keep the ini file in the same directory as the executable.
 7. Drag-and-drop the .bundle file you found earlier on the executable and follow the instructions written in the console that will pop up. Alternatively, you can run the following commands in a terminal:
 
    On Windows:
